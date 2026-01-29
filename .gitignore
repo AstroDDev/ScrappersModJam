@@ -2,6 +2,7 @@
 .idea
 gradle
 libs
+build
 build.gradle.kts
 gradlew
 gradlew.bat
