@@ -1,0 +1,18 @@
+{
+  "Group": "ModJam",
+  "Name": "I don't have a name for this mod yet",
+  "Version": "1.0.0",
+  "Description": "",
+  "Authors": [
+    {
+      "Name": "Astro Dwarf"
+    },
+    {
+      "Name": "Cxom"
+    }
+  ],
+  "Website": "",
+  "Main": "com.modjam.hytalemoddingjam.MainPlugin",
+  "ServerVersion": "*",
+  "Dependencies": {}
+}
