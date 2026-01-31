@@ -1,4 +1,4 @@
-package com.modjam.hytalemoddingjam.Matchmaking.Commands;
+package com.modjam.hytalemoddingjam.Matchmaking.Commands.lobby;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -8,13 +8,12 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import com.modjam.hytalemoddingjam.Matchmaking.Lobby;
 import com.modjam.hytalemoddingjam.Matchmaking.MatchmakingSystem;
 import com.hypixel.hytale.server.core.Message;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-public class ListLobbiesCommand extends AbstractPlayerCommand {
-    public ListLobbiesCommand(@NonNullDecl String name, @NonNullDecl String description) {
+public class LeaveLobbyCommand extends AbstractPlayerCommand {
+    public LeaveLobbyCommand(@NonNullDecl String name, @NonNullDecl String description) {
         super(name, description);
     }
 
@@ -25,9 +24,11 @@ public class ListLobbiesCommand extends AbstractPlayerCommand {
         if(player == null) {
             return;
         }
-        playerRef.sendMessage(Message.raw("[Matchmaking] Available Lobbies:"));
-        for(Lobby lobby : MatchmakingSystem.getInstance().getActiveLobbies()) {
-            playerRef.sendMessage(Message.raw(lobby.getInfo()));
+
+        if(MatchmakingSystem.getInstance().leaveLobby(player)) {
+            playerRef.sendMessage(Message.raw("[Matchmaking] You have left the lobby."));
+        } else {
+            playerRef.sendMessage(Message.raw("[Matchmaking] You are not in a lobby."));
         }
     }
 }

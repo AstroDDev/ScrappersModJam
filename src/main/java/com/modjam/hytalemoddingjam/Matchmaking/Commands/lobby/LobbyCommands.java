@@ -1,4 +1,4 @@
-package com.modjam.hytalemoddingjam.Matchmaking.Commands;
+package com.modjam.hytalemoddingjam.Matchmaking.Commands.lobby;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;

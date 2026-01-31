@@ -6,6 +6,9 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.modjam.hytalemoddingjam.Matchmaking.Commands.MatchmakingCommands;
+import com.modjam.hytalemoddingjam.Matchmaking.Commands.lobby.LobbyCommands;
+import com.modjam.hytalemoddingjam.Matchmaking.MatchmakingSystem;
 import com.modjam.hytalemoddingjam.gameLogic.GameConfig;
 import com.modjam.hytalemoddingjam.gameLogic.GameInstances;
 import com.modjam.hytalemoddingjam.weakpoints.SpawnEntityWithWeakPointCommand;
@@ -25,15 +28,19 @@ public class MainPlugin extends JavaPlugin {
     protected void setup(){
         _instance = this;
 
+        // weak points
         weakPointComponentType = getEntityStoreRegistry().registerComponent(WeakPointComponent.class, "WeakPointComponent", WeakPointComponent.CODEC);
-
+        getCodecRegistry(Interaction.CODEC).register("WeakProjectileCondition", WeakProjectileInteraction.class, WeakProjectileInteraction.CODEC);
         getCommandRegistry().registerCommand(new SpawnEntityWithWeakPointCommand("WeakPointTest", "Test for spawning an enemy that has a weak point on it"));
 
-        getCodecRegistry(Interaction.CODEC).register("WeakProjectileCondition", WeakProjectileInteraction.class, WeakProjectileInteraction.CODEC);
+        // matchmaking + lobbies
+        getCommandRegistry().registerCommand(new MatchmakingCommands());
+        getCommandRegistry().registerCommand(new LobbyCommands());
+        getEntityStoreRegistry().registerSystem(new MatchmakingSystem());
+
+        getCodecRegistry(GameplayConfig.PLUGIN_CODEC).register(GameConfig.class, "MannCo", GameConfig.CODEC);
 
 
-		GameInstances.init(this.getEventRegistry());
-
-		this.getCodecRegistry(GameplayConfig.PLUGIN_CODEC).register(GameConfig.class, "MannCo", GameConfig.CODEC);
+        GameInstances.init(this.getEventRegistry());
     }
 }

@@ -34,8 +34,8 @@ public class GameInstances {
 	}
 
 	public static GameLogic create(World world, GameConfig config) {
-		GameLogic logic;
-		logics.put(world, logic = new GameLogic(world, config));
+		GameLogic logic = new GameLogic(world, config);
+		logics.put(world, logic);
 		return logic;
 	}
 }

@@ -1,8 +1,10 @@
-package com.modjam.hytalemoddingjam.Matchmaking.Commands;
+package com.modjam.hytalemoddingjam.Matchmaking.Commands.lobby;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
+import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -12,9 +14,11 @@ import com.modjam.hytalemoddingjam.Matchmaking.MatchmakingSystem;
 import com.hypixel.hytale.server.core.Message;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-public class LeaveLobbyCommand extends AbstractPlayerCommand {
-    public LeaveLobbyCommand(@NonNullDecl String name, @NonNullDecl String description) {
+public class JoinLobbyCommand extends AbstractPlayerCommand {
+    private final RequiredArg<String> lobbyId;
+    public JoinLobbyCommand(@NonNullDecl String name, @NonNullDecl String description) {
         super(name, description);
+        this.lobbyId = this.withRequiredArg("lobbyId", "The ID of the lobby to join.", ArgTypes.STRING);
     }
 
     @Override
@@ -25,10 +29,10 @@ public class LeaveLobbyCommand extends AbstractPlayerCommand {
             return;
         }
 
-        if(MatchmakingSystem.getInstance().leaveLobby(player)) {
-            playerRef.sendMessage(Message.raw("[Matchmaking] You have left the lobby."));
+        if(MatchmakingSystem.getInstance().joinLobby(player, lobbyId.get(commandContext))) {
+            playerRef.sendMessage(Message.raw("[Matchmaking] You have joined the lobby: " + lobbyId.get(commandContext)));
         } else {
-            playerRef.sendMessage(Message.raw("[Matchmaking] You are not in a lobby."));
+            playerRef.sendMessage(Message.raw("[Matchmaking] Failed to join the lobby: " + lobbyId.get(commandContext)));
         }
     }
 }

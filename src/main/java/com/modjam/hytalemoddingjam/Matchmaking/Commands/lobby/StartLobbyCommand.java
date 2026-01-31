@@ -1,10 +1,8 @@
-package com.modjam.hytalemoddingjam.Matchmaking.Commands;
+package com.modjam.hytalemoddingjam.Matchmaking.Commands.lobby;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
-import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -15,8 +13,10 @@ import com.modjam.hytalemoddingjam.Matchmaking.MatchmakingSystem;
 import com.hypixel.hytale.server.core.Message;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
-public class ViewLobbyCommand extends AbstractPlayerCommand {
-    public ViewLobbyCommand(@NonNullDecl String name, @NonNullDecl String description) {
+import java.util.Objects;
+
+public class StartLobbyCommand extends AbstractPlayerCommand {
+    public StartLobbyCommand(@NonNullDecl String name, @NonNullDecl String description) {
         super(name, description);
     }
 
@@ -27,10 +27,19 @@ public class ViewLobbyCommand extends AbstractPlayerCommand {
         if(player == null) {
             return;
         }
+
+        Lobby currentLobby = MatchmakingSystem.getInstance().getPlayerLobby(player);
+        if(!Objects.equals(currentLobby.getID(), player.getDisplayName())) {
+            playerRef.sendMessage(Message.raw("[Matchmaking] Only the lobby creator can start the game."));
+            return;
+        }
         
-        Lobby lobby = MatchmakingSystem.getInstance().getPlayerLobby(player);
-        if(lobby != null) {
-            playerRef.sendMessage(Message.raw("[Matchmaking] Your lobby info: " + lobby.getInfo()));
+        if(currentLobby != null) {
+            if(currentLobby.startGame()) {
+                playerRef.sendMessage(Message.raw("[Matchmaking] Game Manually Started!"));
+            } else {
+                playerRef.sendMessage(Message.raw("[Matchmaking] Failed to start the game. Make sure all conditions are met."));
+            }
         } else {
             playerRef.sendMessage(Message.raw("[Matchmaking] You are not in a lobby."));
         }
