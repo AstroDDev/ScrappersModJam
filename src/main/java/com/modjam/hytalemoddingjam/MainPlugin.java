@@ -23,10 +23,9 @@ public class MainPlugin extends JavaPlugin {
         _instance = this;
 
         weakPointComponentType = getEntityStoreRegistry().registerComponent(WeakPointComponent.class, "WeakPointComponent", WeakPointComponent.CODEC);
-        //weakPointsProjectileComponentType = getEntityStoreRegistry().registerComponent(WeakPointsProjectileComponent.class, "WeakPointsProjectileComponent", WeakPointsProjectileComponent.CODEC);
 
         getCommandRegistry().registerCommand(new SpawnEntityWithWeakPointCommand("WeakPointTest", "Test for spawning an enemy that has a weak point on it"));
 
-        getCodecRegistry(Interaction.CODEC).register("WeakProjectile", WeakProjectileInteraction.class, WeakProjectileInteraction.CODEC);
+        getCodecRegistry(Interaction.CODEC).register("WeakProjectileCondition", WeakProjectileInteraction.class, WeakProjectileInteraction.CODEC);
     }
 }
