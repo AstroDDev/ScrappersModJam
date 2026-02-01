@@ -3,7 +3,6 @@ package com.modjam.hytalemoddingjam.gameLogic.spawing;
 import com.hypixel.hytale.builtin.instances.InstancesPlugin;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.modjam.hytalemoddingjam.gameLogic.GameConfig;
@@ -25,20 +24,20 @@ public class WaveHelper {
         spawner.Disable();
     }
 
-    public void Start(Store<EntityStore> store){
-        waveStartTime = new Date().getTime() + config.getWaveIntermissionLength();
+    public void start(Store<EntityStore> store){
+        waveStartTime = System.currentTimeMillis() + config.getWaveIntermissionLength();
         waveIndex = 0;
         intermission = true;
     }
 
-    public void Update(Store<EntityStore> store){
-        long currentTime = new Date().getTime();
+    public void update(Store<EntityStore> store){
+        long currentTime = System.currentTimeMillis();
 
         if (intermission) {
             if (currentTime > waveStartTime){
                 intermission = false;
                 spawner.Enable();
-                store.getExternalData().getWorld().sendMessage(Message.raw("Wave " + (waveIndex + 1) +" has started"));
+                store.getExternalData().getWorld().sendMessage(Message.raw("Wave " + (waveIndex + 1) + " has started"));
                 //To Do!!! Run UI Events here to say the next wave started and also update quota
             }
         }
@@ -69,5 +68,17 @@ public class WaveHelper {
                 spawner.Spawn(store);
             }
         }
+    }
+
+    public long getWaveStartTime() {
+        return waveStartTime;
+    }
+
+    public int getWaveIndex() {
+        return waveIndex;
+    }
+
+    public boolean isIntermission() {
+        return intermission;
     }
 }

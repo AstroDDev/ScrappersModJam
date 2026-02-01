@@ -3,15 +3,12 @@ package com.modjam.hytalemoddingjam.gameLogic;
 import com.hypixel.hytale.builtin.npceditor.NPCRoleAssetTypeHandler;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.HytaleServer;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.corecomponents.world.ActionStorePosition;
 import com.modjam.hytalemoddingjam.gameLogic.spawing.WaveHelper;
-import com.modjam.hytalemoddingjam.gameLogic.spawing.WaveSpawner;
 
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
@@ -21,7 +18,7 @@ public class GameLogic {
 	public final GameConfig config;
 	public final World world;
 	public final Store<EntityStore> store;
-	private final ScheduledFuture<?> executor;
+	private ScheduledFuture<?> executor;
 	private boolean started = false;
 	private int units = 50;
 	private int collectedgears = 0;
@@ -32,11 +29,26 @@ public class GameLogic {
 		this.config = config;
 		this.world = world;
 		this.store = world.getEntityStore().getStore();
+	}
+
+	public void start() {
+		this.units = 50;
+		this.collectedgears = 0;
+
 		this.executor = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> world.execute(this::tick), 500, 500, TimeUnit.MILLISECONDS);
+		this.started = true;
+
+		this.waveHelper = new WaveHelper(config);
+		waveHelper.start(store);
 	}
 
 	public void tick() {
-		if(started) {
+        if (!started) {
+            return;
+        }
+
+		waveHelper.update(store);
+
 			/*if(units > 0) {
 				for(EnemySpawnPoint point : this.config.getPoints()) {
 					NPCPlugin.get().spawnNPC(world.getEntityStore().getStore(), "Skeleton", null, point.getPos(), Vector3f.ZERO.clone());
@@ -64,24 +76,11 @@ public class GameLogic {
 				//collectedgears = 0;
 				world.sendMessage(Message.raw("WINNED!"));
 			}*/
-
-
-			waveHelper.Update(store);
-		}
-	}
+    }
 
 	public List<Player> getPlayers() {
 		return world.getPlayerRefs().stream().map((ref) -> ref.getReference().getStore().getComponent(ref.getReference(), Player.getComponentType())).toList();
 
-	}
-
-	public void start() {
-		this.units = 50;
-		this.collectedgears = 0;
-		this.started = true;
-
-		this.waveHelper = new WaveHelper(config);
-		waveHelper.Start(store);
 	}
 
 	public void cleanup() {
@@ -90,5 +89,9 @@ public class GameLogic {
 
 	public void stop() {
 		this.started = false;
+	}
+
+	public WaveHelper getWaveHelper() {
+		return waveHelper;
 	}
 }
