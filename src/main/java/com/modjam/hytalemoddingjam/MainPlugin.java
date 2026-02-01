@@ -15,6 +15,7 @@ import com.modjam.hytalemoddingjam.Matchmaking.MatchmakingSystem;
 import com.modjam.hytalemoddingjam.commands.GameCommand;
 import com.modjam.hytalemoddingjam.gameLogic.GameConfig;
 import com.modjam.hytalemoddingjam.gameLogic.GameInstances;
+import com.modjam.hytalemoddingjam.hud.MannCoHudSystem;
 import com.modjam.hytalemoddingjam.weakpoints.SpawnEntityWithWeakPointCommand;
 import com.modjam.hytalemoddingjam.weakpoints.WeakPointComponent;
 import com.modjam.hytalemoddingjam.weakpoints.WeakProjectileInteraction;

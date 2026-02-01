@@ -3,20 +3,17 @@ package com.modjam.hytalemoddingjam.gameLogic;
 import com.hypixel.hytale.builtin.instances.InstancesPlugin;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.server.core.Options;
-import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
 import com.hypixel.hytale.server.core.universe.world.events.StartWorldEvent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.modjam.hytalemoddingjam.MainPlugin;
-import org.bouncycastle.util.Pack;
+import com.modjam.hytalemoddingjam.hud.MannCoHudSystem;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class GameInstances {
 
@@ -59,6 +56,7 @@ public class GameInstances {
             }
 
             GameLogic logic = new GameLogic(world, config);
+			MainPlugin.getInstance().getEntityStoreRegistry().registerSystem(new MannCoHudSystem(logic));
             logics.put(world.getName(), logic);
             logic.start();
         });
