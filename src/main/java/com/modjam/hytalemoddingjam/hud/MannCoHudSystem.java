@@ -2,13 +2,16 @@ package com.modjam.hytalemoddingjam.hud;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.modjam.hytalemoddingjam.gameLogic.GameInstances;
 import com.modjam.hytalemoddingjam.gameLogic.GameLogic;
 
 import javax.annotation.Nonnull;
@@ -16,38 +19,44 @@ import javax.annotation.Nonnull;
 public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
 
     private static final long ANNOUNCEMENT_LENGTH_MILLIS = 2000;
-    private final GameLogic gameLogic;
-
-    public MannCoHudSystem(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
-    }
 
     @Nonnull
     @Override
     public Query<EntityStore> getQuery() {
-        // TODO need a component to determine if player in game or not
+        // TODO this would be best if it used a component specific to players in the game
         return Player.getComponentType();
     }
 
     @Override
     public void tick(float dt, int index, @Nonnull ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull Store<EntityStore> store, @Nonnull CommandBuffer<EntityStore> commandBuffer) {
         Player player = archetypeChunk.getComponent(index, Player.getComponentType());
-
-        if (player.getWorld().getName().equals("default")) return;
-
-        UICommandBuilder builder = new UICommandBuilder();
-        if (System.currentTimeMillis() - gameLogic.getWaveHelper().getWaveStartTime() < ANNOUNCEMENT_LENGTH_MILLIS) {
-            if (gameLogic.getWaveHelper().isIntermission()) {
-                builder.set("#BannerTitle", "Wave " + (gameLogic.getWaveHelper().getWaveIndex() + 1) + " Over!");
-            } else {
-                builder.set("#BannerTitle", "Wave " + (gameLogic.getWaveHelper().getWaveIndex() + 1) + " Incoming!");
-            }
-        }
+        PlayerRef playerRef = archetypeChunk.getComponent(index, PlayerRef.getComponentType());
 
         CustomUIHud customHud = player.getHudManager().getCustomHud();
-        if (customHud != null) {
-            customHud.update(true, builder);
+        GameLogic gameLogic = GameInstances.get(player.getWorld());
+        if (gameLogic == null) {
+            return;
         }
-    }
 
+        if (customHud == null) {
+            MannCoHud mannCoHud = new MannCoHud(playerRef);
+            player.getHudManager().setCustomHud(playerRef, mannCoHud);
+            customHud = mannCoHud;
+        }
+
+        UICommandBuilder builder = new UICommandBuilder();
+        builder.append("Hud.ui");
+        if (System.currentTimeMillis() - gameLogic.getWaveHelper().getWaveStartTime() < ANNOUNCEMENT_LENGTH_MILLIS) {
+            if (gameLogic.getWaveHelper().isIntermission()) {
+                // NOTE: this is + 1 for 0-indexed then - 1 because wave over happens after index increment
+                builder.set("#BannerTitle.Text", "Wave " + (gameLogic.getWaveHelper().getWaveIndex()) + " Over!");
+            } else {
+                builder.set("#BannerTitle.Text", "Wave " + (gameLogic.getWaveHelper().getWaveIndex() + 1) + " Incoming!");
+            }
+        } else {
+            builder.set("#BannerTitle.Text", "");
+        }
+
+        customHud.update(true, builder);
+    }
 }

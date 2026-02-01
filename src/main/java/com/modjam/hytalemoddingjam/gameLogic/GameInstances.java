@@ -56,7 +56,6 @@ public class GameInstances {
             }
 
             GameLogic logic = new GameLogic(world, config);
-			MainPlugin.getInstance().getEntityStoreRegistry().registerSystem(new MannCoHudSystem(logic));
             logics.put(world.getName(), logic);
             logic.start();
         });

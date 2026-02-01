@@ -50,5 +50,8 @@ public class MainPlugin extends JavaPlugin {
         registry.registerGlobal(StartWorldEvent.class, GameInstances::onStartWorldEvent);
         registry.registerGlobal(RemoveWorldEvent.class, GameInstances::onRemoveWorldEvent);
         this.getCommandRegistry().registerCommand(new GameCommand());
+
+        // ui
+        MainPlugin.getInstance().getEntityStoreRegistry().registerSystem(new MannCoHudSystem());
     }
 }
