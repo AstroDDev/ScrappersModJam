@@ -1,5 +1,6 @@
 package com.modjam.hytalemoddingjam.gameLogic;
 
+import com.hypixel.hytale.builtin.npceditor.NPCRoleAssetTypeHandler;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
@@ -7,6 +8,8 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.npc.NPCPlugin;
+import com.hypixel.hytale.server.npc.corecomponents.world.ActionStorePosition;
 import com.modjam.hytalemoddingjam.gameLogic.spawing.WaveHelper;
 import com.modjam.hytalemoddingjam.gameLogic.spawing.WaveSpawner;
 
@@ -86,6 +89,6 @@ public class GameLogic {
 	}
 
 	public void stop() {
-
+		this.started = false;
 	}
 }

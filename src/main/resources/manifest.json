@@ -20,5 +20,7 @@
   "Website": "",
   "Main": "com.modjam.hytalemoddingjam.MainPlugin",
   "ServerVersion": "*",
-  "Dependencies": {}
+  "Dependencies": {
+    "Hytale:EntityModule": "*"
+  }
 }
