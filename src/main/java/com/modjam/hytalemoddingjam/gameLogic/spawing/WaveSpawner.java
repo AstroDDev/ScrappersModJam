@@ -28,7 +28,6 @@ public class WaveSpawner {
 	private double weakGroupSize;
 	private double weakSpawnRate;
 	private double strongSpawnRate;
-
 	private boolean disabled = false;
 
 	public WaveSpawner(double difficulty, GameConfig config) {

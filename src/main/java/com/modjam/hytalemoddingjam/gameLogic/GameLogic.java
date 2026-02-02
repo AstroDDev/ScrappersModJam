@@ -1,18 +1,23 @@
 package com.modjam.hytalemoddingjam.gameLogic;
 
+import com.hypixel.hytale.builtin.instances.InstancesPlugin;
 import com.hypixel.hytale.builtin.npceditor.NPCRoleAssetTypeHandler;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.corecomponents.world.ActionStorePosition;
+import com.modjam.hytalemoddingjam.MainPlugin;
 import com.modjam.hytalemoddingjam.gameLogic.spawing.WaveHelper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -35,11 +40,26 @@ public class GameLogic {
 
 		this.executor = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> world.execute(this::tick), 500, 500, TimeUnit.MILLISECONDS);
 		this.started = true;
-
-		this.waveHelper = new WaveHelper(config);
+		var savedDifficluty= Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).getLocalDifficulty();
+		this.waveHelper = new WaveHelper(config, savedDifficluty);
 		waveHelper.start(store);
+		waveHelper.setGameOverFunction(this::onGameEnd);
 	}
+	public void onGameEnd(EndedGameData data)
+	{
 
+		this.stop();
+		Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).addDifficulty(data.isWon()?1:-1);
+		world.sendMessage(Message.raw("Game "+(data.isWon()?"Won":"Over")+"!"));
+		world.sendMessage(Message.raw("You survived "+data.getLastWave()+" waves.\nYou collected "+data.getTotalScrap()+" scraps."));
+		world.sendMessage(Message.raw("Instance will close in 10 secondes"));
+		HytaleServer.SCHEDULED_EXECUTOR.schedule(()->{
+			System.out.println("triggered");
+			world.stopIndividualWorld();
+
+		},10,TimeUnit.SECONDS);
+
+	}
 	/**
 	 * Temporary method, allow for easy collect scrap from inventory for now
 	 */

@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.asset.type.gameplay.GameplayConfig;
 import com.hypixel.hytale.server.core.asset.type.gameplay.respawn.RespawnController;
 import com.hypixel.hytale.server.core.asset.type.gameplay.respawn.WorldSpawnPoint;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
+import com.hypixel.hytale.server.core.modules.time.TimeResource;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
@@ -15,6 +16,7 @@ import com.modjam.hytalemoddingjam.Matchmaking.Commands.MatchmakingCommands;
 import com.modjam.hytalemoddingjam.Matchmaking.Commands.lobby.LobbyCommands;
 import com.modjam.hytalemoddingjam.Matchmaking.MatchmakingSystem;
 import com.modjam.hytalemoddingjam.commands.GameCommand;
+import com.modjam.hytalemoddingjam.gameLogic.DifficultyResource;
 import com.modjam.hytalemoddingjam.gameLogic.GameConfig;
 import com.modjam.hytalemoddingjam.gameLogic.GameInstances;
 import com.modjam.hytalemoddingjam.gameLogic.GameRespawnController;
@@ -31,8 +33,10 @@ public class MainPlugin extends JavaPlugin {
 
     private static MainPlugin _instance;
     public static MainPlugin getInstance(){ return _instance; }
+	private static ResourceType<EntityStore, DifficultyResource> difficultyRessource;
+	public static ResourceType<EntityStore, DifficultyResource> getDifficultyResourceType() {return difficultyRessource;}
 
-    @Override
+	@Override
     protected void setup(){
         _instance = this;
 
@@ -48,6 +52,7 @@ public class MainPlugin extends JavaPlugin {
 
         // game and game config
         getCodecRegistry(GameplayConfig.PLUGIN_CODEC).register(GameConfig.class, "MannCo", GameConfig.CODEC);
+		difficultyRessource = this.getEntityStoreRegistry().registerResource(DifficultyResource.class, "MannCoDifficulty", DifficultyResource.CODEC);
 
 		RespawnController.CODEC.register("MannCoGameRespawn", GameRespawnController.class, GameRespawnController.CODEC);
         EventRegistry registry = this.getEventRegistry();

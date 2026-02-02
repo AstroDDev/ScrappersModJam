@@ -6,9 +6,11 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.modjam.hytalemoddingjam.gameLogic.EndedGameData;
 import com.modjam.hytalemoddingjam.gameLogic.GameConfig;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 public class WaveHelper {
     private GameConfig config;
@@ -20,11 +22,17 @@ public class WaveHelper {
 	private int quota=0;
 	private int scrapCollectedWave=0;
 	private int scrapCollectedTotal=0;
-    public WaveHelper(GameConfig config){
+	private Consumer<EndedGameData> triggerGameOver;
+    public WaveHelper(GameConfig config,double serverDifficulty ){
         this.config = config;
-        this.spawner = new WaveSpawner(1, config);
+        this.spawner = new WaveSpawner(serverDifficulty, config);
         spawner.Disable();
+
     }
+	public void setGameOverFunction(Consumer<EndedGameData> fn)
+	{
+		this.triggerGameOver=fn;
+	}
 
     public void start(Store<EntityStore> store){
         waveStartTime = System.currentTimeMillis() + config.getWaveIntermissionLength();
@@ -55,7 +63,8 @@ public class WaveHelper {
 				}
 				else
 				{
-
+					if(triggerGameOver !=null)
+						triggerGameOver.accept(new EndedGameData().setLastWave(waveIndex).setTotalScrap(scrapCollectedTotal).setWon(false));
 					spawner.Disable();
 					//TODO not enough scraps, game over.
 				}
@@ -82,12 +91,9 @@ public class WaveHelper {
 		waveStartTime = currentTime + config.getWaveIntermissionLength();
 
 		if (waveIndex >= config.getWaveCount()){
-			//Crude end the game for now
-			Collection<PlayerRef> playerRefs = store.getExternalData().getWorld().getPlayerRefs();
+			if(triggerGameOver !=null)
+				triggerGameOver.accept(new EndedGameData().setLastWave(waveIndex).setTotalScrap(scrapCollectedTotal).setWon(true));
 
-			for (PlayerRef playerRef : playerRefs){
-				InstancesPlugin.exitInstance(playerRef.getReference(), store);
-			}
 		}
 		else{
 			store.getExternalData().getWorld().sendMessage(Message.raw("Wave " + waveIndex + " has ended"));
