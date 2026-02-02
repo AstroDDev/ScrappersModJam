@@ -66,7 +66,6 @@ public class WaveHelper {
 					if(triggerGameOver !=null)
 						triggerGameOver.accept(new EndedGameData().setLastWave(waveIndex).setTotalScrap(scrapCollectedTotal).setWon(false));
 					spawner.Disable();
-					//TODO not enough scraps, game over.
 				}
 
             }
@@ -99,7 +98,12 @@ public class WaveHelper {
 			store.getExternalData().getWorld().sendMessage(Message.raw("Wave " + waveIndex + " has ended"));
 		}
 	}
-
+	public void forceEnd()
+	{
+		if(triggerGameOver !=null)
+			triggerGameOver.accept(new EndedGameData().setLastWave(waveIndex).setTotalScrap(scrapCollectedTotal).setWon(false));
+		spawner.Disable();
+	}
     public long getWaveStartTime() {
         return waveStartTime;
     }

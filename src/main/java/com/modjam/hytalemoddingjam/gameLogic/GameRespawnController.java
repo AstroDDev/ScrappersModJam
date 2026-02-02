@@ -5,6 +5,7 @@ import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.ComponentAccessor;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.asset.type.gameplay.respawn.RespawnController;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
@@ -31,16 +32,24 @@ public class GameRespawnController implements RespawnController {
       assert spawnProvider != null;
 	   GameLogic logic= GameInstances.get(world);
 	   assert logic !=null;
-	   if(logic.revivePlayer(playerReference.getStore().getComponent(playerReference,Player.getComponentType()).getDisplayName()))
-	   {
-		   Transform spawnPoint = spawnProvider.getSpawnPoint(playerReference, commandBuffer);
-		   Teleport teleportComponent = Teleport.createForPlayer(spawnPoint);
-		   world.execute(()-> commandBuffer.addComponent(playerReference, Teleport.getComponentType(), teleportComponent));
-
+	   Transform spawnPoint=null;
+	   if(logic.revivePlayer(playerReference.getStore().getComponent(playerReference,Player.getComponentType()).getDisplayName())) {
+		   spawnPoint = spawnProvider.getSpawnPoint(playerReference, commandBuffer);
 	   }
 	   else
-		   world.execute(()->InstancesPlugin.exitInstance(playerReference, commandBuffer));
-
+	   {
+		   var game=GameInstances.get(world);
+		   if(game!=null) {
+			   spawnPoint = new Transform(game.config.getSpectatorArea().toVector3d().add(0.5, 0, 0.5), Vector3f.ZERO.clone());
+			   game.addPlayerToDeadList(playerReference);
+		   }
+	   }
+	   if(spawnPoint !=null) {
+		   Teleport teleportComponent = Teleport.createForPlayer(spawnPoint);
+		   world.execute(() -> commandBuffer.addComponent(playerReference, Teleport.getComponentType(), teleportComponent));
+	   }
+	   else
+	   		world.execute(()->InstancesPlugin.exitInstance(playerReference, commandBuffer));
 	   return CompletableFuture.completedFuture(null);
    }
 }

@@ -2,11 +2,17 @@ package com.modjam.hytalemoddingjam.gameLogic;
 
 import com.hypixel.hytale.builtin.instances.InstancesPlugin;
 import com.hypixel.hytale.builtin.npceditor.NPCRoleAssetTypeHandler;
+import com.hypixel.hytale.component.CommandBuffer;
+import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.HytaleServer;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffect;
+import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.InteractionEffects;
+import com.hypixel.hytale.server.core.modules.interaction.interaction.config.none.simple.ApplyEffectInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
@@ -29,6 +35,7 @@ public class GameLogic {
 	private ScheduledFuture<?> executor;
 	private boolean started = false;
 	private WaveHelper waveHelper;
+	private List<Ref<EntityStore>> deadPlayers=new ArrayList<>();
 
 	public GameLogic(World world, GameConfig config) {
 		this.config = config;
@@ -54,7 +61,6 @@ public class GameLogic {
 		world.sendMessage(Message.raw("You survived "+data.getLastWave()+" waves.\nYou collected "+data.getTotalScrap()+" scraps."));
 		world.sendMessage(Message.raw("Instance will close in 10 secondes"));
 		HytaleServer.SCHEDULED_EXECUTOR.schedule(()->{
-			System.out.println("triggered");
 			world.stopIndividualWorld();
 
 		},10,TimeUnit.SECONDS);
@@ -78,12 +84,34 @@ public class GameLogic {
 
 				});
 	}
+	public void applyEffect(String effectId,Ref<EntityStore> player)
+	{
+		EntityEffect entityEffect = EntityEffect.getAssetMap().getAsset(effectId);
+		if (entityEffect != null) {
+			if (player.isValid()) {
+				EffectControllerComponent effectControllerComponent = player.getStore().getComponent(player, EffectControllerComponent.getComponentType());
+				if(effectControllerComponent != null && effectControllerComponent.getActiveEffects().get(EntityEffect.getAssetMap().getIndex(effectId))==null)
+					effectControllerComponent.addEffect(player, entityEffect,player.getStore());
+				
+			}
+		}
+	}
 	public void tick() {
         if (!started) {
             return;
         }
-
 		waveHelper.update(store);
+		boolean atLeast1PlayerAlive=false;
+		for(Player player : getPlayers()) {
+			applyEffect("HealthRegen_Buff_T1",player.getReference());
+			if(!deadPlayers.contains(player.getReference()))
+			{
+				atLeast1PlayerAlive=true;
+				break;
+			}
+		}
+		if(!atLeast1PlayerAlive)
+		waveHelper.forceEnd();
     }
 
 	public List<Player> getPlayers() {
@@ -106,6 +134,10 @@ public class GameLogic {
 		world.sendMessage(Message.raw(username+" is out of the game!"));
 		return false;
 
+	}
+	public void addPlayerToDeadList(Ref<EntityStore> dead)
+	{
+		world.execute(()->deadPlayers.add(dead));
 	}
 	public void cleanup() {
 		executor.cancel(true);
