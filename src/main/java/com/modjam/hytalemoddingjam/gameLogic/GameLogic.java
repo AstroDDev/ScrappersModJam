@@ -40,37 +40,21 @@ public class GameLogic {
 		waveHelper.start(store);
 	}
 
-	/**
-	 * Temporary method, allow for easy collect scrap from inventory for now
-	 */
-	private void autoScoreScraps()
-	{
-				getPlayers().forEach(pl -> {
-
-					var trans = pl.getInventory().getCombinedEverything().removeItemStack(new ItemStack("RustyGear", 10), false, true);
-					var eaten = 10;
-					if(trans.getRemainder() != null)
-						eaten -= trans.getRemainder().getQuantity();
-					if(eaten > 0) {
-						waveHelper.scrapCollected(eaten,world);
-					}
-
-
-				});
-	}
 	public void tick() {
         if (!started) {
             return;
         }
-		autoScoreScraps();
+
 		waveHelper.update(store);
-
-
     }
 
 	public List<Player> getPlayers() {
 		return world.getPlayerRefs().stream().map((ref) -> ref.getReference().getStore().getComponent(ref.getReference(), Player.getComponentType())).toList();
 
+	}
+
+	public void collectGear(){
+		collectedgears++;
 	}
 
 	public boolean revivePlayer(String username)
