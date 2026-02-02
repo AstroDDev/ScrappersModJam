@@ -60,7 +60,7 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
 		else
 			time= (int) ((gameLogic.getWaveHelper().getWaveStartTime()+ gameLogic.config.getWaveLength())-System.currentTimeMillis());
 		time=time/1000;
-		builder.set("#TimerLabel.Text",""+(time/1000));
+		builder.set("#TimerLabel.Text",""+time);
         if (System.currentTimeMillis() - gameLogic.getWaveHelper().getWaveStartTime() < ANNOUNCEMENT_LENGTH_MILLIS) {
             if (gameLogic.getWaveHelper().isIntermission()) {
                 // NOTE: this is + 1 for 0-indexed then - 1 because wave over happens after index increment
