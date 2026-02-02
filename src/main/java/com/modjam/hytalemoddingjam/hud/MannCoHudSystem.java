@@ -35,6 +35,8 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
         CustomUIHud customHud = player.getHudManager().getCustomHud();
         GameLogic gameLogic = GameInstances.get(player.getWorld());
         if (gameLogic == null) {
+			if(customHud instanceof MannCoHud)
+				player.getHudManager().setCustomHud(playerRef,null);
             return;
         }
 
