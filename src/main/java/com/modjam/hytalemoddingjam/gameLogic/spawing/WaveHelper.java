@@ -45,6 +45,7 @@ public class WaveHelper {
 
         if (intermission) {
             if (currentTime > waveStartTime){
+				scrapCollectedWave = 0;
                 intermission = false;
                 spawner.Enable();
                 store.getExternalData().getWorld().sendMessage(Message.raw("Wave " + (waveIndex + 1) + " has started"));
@@ -77,13 +78,12 @@ public class WaveHelper {
 	private void nextWave(Store<EntityStore> store, long currentTime)
 	{
 		waveIndex++;
-		quota = (int) Math.floor(config.getScrapQuotaRate() * spawner.getDifficulty());
 		//Is all bonus scrap loss at the end of a wave? If so we should reset this to 0 instead.
-		scrapCollectedWave = 0;
 
 		spawner.Disable();
 		spawner.Despawn(store);
-		spawner.setWave(waveIndex);
+		var localDiff=spawner.setWave(waveIndex);
+		quota = (int) Math.floor(config.getScrapQuotaRate() * localDiff);
 
 		intermission = true;
 		waveStartTime = currentTime + config.getWaveIntermissionLength();

@@ -43,7 +43,7 @@ public class WaveSpawner {
 		strongSpawnRate = config.getWaveLength() / (config.getStrongSpawnAmount() * difficulty);
 	}
 
-	public void setWave(int wave) {
+	public double setWave(int wave) {
 		this.wave = wave;
 
 		double localDifficulty = difficulty + (this.wave * config.getWaveDifficultyIncrease());
@@ -53,6 +53,7 @@ public class WaveSpawner {
 		weakGroupSize = MathUtil.lerpUnclamped(config.getWeakGroupingMin(), config.getWeakGroupingMax(), localDifficulty);
 		weakSpawnRate = config.getWaveLength() / (config.getWeakSpawnAmount() * localDifficulty / weakGroupSize);
 		strongSpawnRate = config.getWaveLength() / (config.getStrongSpawnAmount() * localDifficulty);
+		return localDifficulty;
 	}
 
 	public void Disable() {disabled = true;}

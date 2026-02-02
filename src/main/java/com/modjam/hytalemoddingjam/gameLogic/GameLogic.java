@@ -11,6 +11,7 @@ import com.hypixel.hytale.server.core.asset.type.entityeffect.config.EntityEffec
 import com.hypixel.hytale.server.core.entity.effect.EffectControllerComponent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.InteractionEffects;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.none.simple.ApplyEffectInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -53,11 +54,17 @@ public class GameLogic {
 		waveHelper.setGameOverFunction(this::onGameEnd);
 		this.world.sendMessage(Message.raw("Hazard Level is " + Math.floor(savedDifficluty * 100)));
 	}
+	public void respawnAllPlayers()
+	{
+		deadPlayers.forEach(()->{
+			Teleport.createForPlayer(world.getWorldConfig().getSpawnProvider().)
+		});
+	}
 	public void onGameEnd(EndedGameData data)
 	{
 
 		this.stop();
-		Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).addDifficulty(data.isWon()?1:-1);
+		Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).addDifficulty(data.isWon()?0.25:-0.25);
 		world.sendMessage(Message.raw("Game "+(data.isWon()?"Won":"Over")+"!"));
 		world.sendMessage(Message.raw("You survived "+data.getLastWave()+" waves.\nYou collected "+data.getTotalScrap()+" scraps."));
 		world.sendMessage(Message.raw("Instance will close in 10 secondes"));

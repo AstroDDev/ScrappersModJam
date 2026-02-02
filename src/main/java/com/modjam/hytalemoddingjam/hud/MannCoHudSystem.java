@@ -49,13 +49,14 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
         UICommandBuilder builder = new UICommandBuilder();
         builder.append("Hud.ui");
 		if(gameLogic.getWaveHelper().isIntermission()) {
-			builder.set("#GearLabel.Text", "0/0");
+			//builder.set("#GearLabel.Text", "0/0");
 			builder.set("#WaveLabel.Text", "Prep Time");
 		}
 		else {
-			builder.set("#GearLabel.Text", gameLogic.getWaveHelper().getScrapCollectedWave()+"/"+gameLogic.getWaveHelper().getQuota());
+
 			builder.set("#WaveLabel.Text", "Wave "+(gameLogic.getWaveHelper().getWaveIndex()+1));
 		}
+		builder.set("#GearLabel.Text", gameLogic.getWaveHelper().getScrapCollectedWave()+"/"+gameLogic.getWaveHelper().getQuota());
 		var time=0;
 		if(gameLogic.getWaveHelper().isIntermission())
 			time=(int)Math.abs(System.currentTimeMillis() -  gameLogic.getWaveHelper().getWaveStartTime());
