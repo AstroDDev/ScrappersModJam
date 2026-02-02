@@ -48,39 +48,15 @@ public class GameLogic {
         }
 
 		waveHelper.update(store);
-
-			/*if(units > 0) {
-				for(EnemySpawnPoint point : this.config.getPoints()) {
-					NPCPlugin.get().spawnNPC(world.getEntityStore().getStore(), "Skeleton", null, point.getPos(), Vector3f.ZERO.clone());
-					units--;
-				}
-			}
-			if(config.getPortalScrap() - collectedgears > 0) {
-				getPlayers().forEach(pl -> {
-					var required = config.getPortalScrap() - collectedgears;
-					var trans = pl.getInventory().getCombinedEverything().removeItemStack(new ItemStack("RustyGear", required), false, true);
-
-					var eaten = required;
-					if(trans.getRemainder() != null)
-						eaten -= trans.getRemainder().getQuantity();
-
-					if(eaten > 0) {
-						collectedgears += eaten;
-						world.sendMessage(Message.raw(collectedgears + "/" + config.getPortalScrap() + " gears collected!"));
-					}
-
-
-				});
-			} else {
-				started = false;
-				//collectedgears = 0;
-				world.sendMessage(Message.raw("WINNED!"));
-			}*/
     }
 
 	public List<Player> getPlayers() {
 		return world.getPlayerRefs().stream().map((ref) -> ref.getReference().getStore().getComponent(ref.getReference(), Player.getComponentType())).toList();
 
+	}
+
+	public void collectGear(){
+		collectedgears++;
 	}
 
 	public void cleanup() {
