@@ -51,7 +51,7 @@ public class GameLogic {
 		this.waveHelper = new WaveHelper(this, config, savedDifficluty, this::onGameEnd);
 		waveHelper.start(store);
 		waveHelper.setNextWaveFunction((i)->respawnAllPlayers());
-		this.world.sendMessage(Message.raw("Hazard Level is " + (int)Math.floor(savedDifficluty * 100)));
+		this.world.sendMessage(Message.raw("Hazard Level is " + Math.floor(savedDifficluty)));
 	}
 
 	public void respawnAllPlayers() {
