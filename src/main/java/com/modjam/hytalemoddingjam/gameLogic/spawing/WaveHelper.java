@@ -23,6 +23,7 @@ public class WaveHelper {
 	private int scrapCollectedWave=0;
 	private int scrapCollectedTotal=0;
 	private Consumer<EndedGameData> triggerGameOver;
+	private Consumer<Integer> triggerNextWave;
     public WaveHelper(GameConfig config,double serverDifficulty ){
         this.config = config;
         this.spawner = new WaveSpawner(serverDifficulty, config);
@@ -33,7 +34,10 @@ public class WaveHelper {
 	{
 		this.triggerGameOver=fn;
 	}
-
+	public void setNextWaveFunction(Consumer<Integer> fn)
+	{
+		this.triggerNextWave=fn;
+	}
     public void start(Store<EntityStore> store){
         waveStartTime = System.currentTimeMillis() + config.getWaveIntermissionLength();
         waveIndex = 0;
@@ -77,9 +81,8 @@ public class WaveHelper {
 
 	private void nextWave(Store<EntityStore> store, long currentTime)
 	{
-		waveIndex++;
-		//Is all bonus scrap loss at the end of a wave? If so we should reset this to 0 instead.
 
+		waveIndex++;
 		spawner.Disable();
 		spawner.Despawn(store);
 		var localDiff=spawner.setWave(waveIndex);
@@ -95,7 +98,10 @@ public class WaveHelper {
 		}
 		else{
 			store.getExternalData().getWorld().sendMessage(Message.raw("Wave " + waveIndex + " has ended"));
+			if(triggerNextWave!=null)
+				triggerNextWave.accept(waveIndex);
 		}
+
 	}
 	public void forceEnd()
 	{

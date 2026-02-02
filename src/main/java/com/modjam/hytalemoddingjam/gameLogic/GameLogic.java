@@ -52,13 +52,16 @@ public class GameLogic {
 		this.waveHelper = new WaveHelper(config, savedDifficluty);
 		waveHelper.start(store);
 		waveHelper.setGameOverFunction(this::onGameEnd);
+		waveHelper.setNextWaveFunction((i)->respawnAllPlayers());
 		this.world.sendMessage(Message.raw("Hazard Level is " + Math.floor(savedDifficluty * 100)));
 	}
 	public void respawnAllPlayers()
 	{
-		deadPlayers.forEach(()->{
-			Teleport.createForPlayer(world.getWorldConfig().getSpawnProvider().)
+		deadPlayers.forEach((p)->{
+			var tp=Teleport.createForPlayer(world.getWorldConfig().getSpawnProvider().getSpawnPoint(p,p.getStore()));
+			p.getStore().addComponent(p,Teleport.getComponentType(),tp);
 		});
+		deadPlayers.clear();
 	}
 	public void onGameEnd(EndedGameData data)
 	{
