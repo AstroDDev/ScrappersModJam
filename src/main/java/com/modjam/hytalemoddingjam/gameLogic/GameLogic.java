@@ -103,12 +103,12 @@ public class GameLogic {
         }
 		waveHelper.update(store);
 		boolean atLeast1PlayerAlive=false;
+
 		for(Player player : getPlayers()) {
 			applyEffect("HealthRegen_Buff_T1",player.getReference());
 			if(!deadPlayers.contains(player.getReference()))
 			{
 				atLeast1PlayerAlive=true;
-				break;
 			}
 		}
 		if(!atLeast1PlayerAlive)
