@@ -4,7 +4,6 @@ public class EndedGameData {
 
 	private int lastWave;
 	private int totalScrap;
-	private int totalDeath;
 	private boolean won;
 
 	public int getLastWave() {
@@ -22,15 +21,6 @@ public class EndedGameData {
 
 	public EndedGameData setTotalScrap(int totalScrap) {
 		this.totalScrap = totalScrap;
-		return this;
-	}
-
-	public int getTotalDeath() {
-		return totalDeath;
-	}
-
-	public EndedGameData setTotalDeath(int totalDeath) {
-		this.totalDeath = totalDeath;
 		return this;
 	}
 

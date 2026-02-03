@@ -34,15 +34,13 @@ public class GameRespawnController implements RespawnController {
 	   assert logic !=null;
 	   Transform spawnPoint=null;
 	   if(logic.revivePlayer(playerReference.getStore().getComponent(playerReference,Player.getComponentType()).getDisplayName())) {
+		   logic.countDeadPlayer();
 		   spawnPoint = spawnProvider.getSpawnPoint(playerReference, commandBuffer);
 	   }
 	   else
 	   {
-		   var game=GameInstances.get(world);
-		   if(game!=null) {
-			   spawnPoint = new Transform(game.config.getSpectatorArea().toVector3d().add(0.5, 0, 0.5), Vector3f.ZERO.clone());
-			   game.addPlayerToDeadList(playerReference);
-		   }
+			   spawnPoint = new Transform(logic.config.getSpectatorArea().toVector3d().add(0.5, 0, 0.5), Vector3f.ZERO.clone());
+			   logic.addPlayerToDeadList(playerReference);
 	   }
 	   if(spawnPoint !=null) {
 		   Teleport teleportComponent = Teleport.createForPlayer(spawnPoint);

@@ -32,7 +32,11 @@ public class DepositScrapInteraction extends SimpleInstantInteraction {
         Player player = store.getComponent(ref, Player.getComponentType());
         Inventory inventory = player.getInventory();
         ItemContainer hotbar = inventory.getHotbar();
-
+			var game=GameInstances.get(world);
+			if(game!=null && game.getWaveHelper().isIntermission()) {
+				player.sendMessage(Message.raw("Can't deposit in prep time!").color(Color.RED));
+				return;
+			}
         for (short i = 0; i < hotbar.getCapacity(); i++){
             ItemStack item = hotbar.getItemStack(i);
             if (item == null) continue;
@@ -42,7 +46,7 @@ public class DepositScrapInteraction extends SimpleInstantInteraction {
 
                 player.sendMessage(Message.raw("You deposited a Rusty Gear").color(Color.GREEN));
 
-                if (GameInstances.has(world)) GameInstances.get(world).collectGear();
+                if (game!=null) game.collectGear();
 
                 return;
             }

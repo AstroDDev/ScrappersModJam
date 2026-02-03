@@ -48,6 +48,7 @@ public class GameLogic {
 	private boolean started = false;
 	private WaveHelper waveHelper;
 	private List<Ref<EntityStore>> deadPlayers = new ArrayList<>();
+	private int deathCount;
 
 	public GameLogic(World world, GameConfig config) {
 		this.config = config;
@@ -96,10 +97,17 @@ public class GameLogic {
 		else primaryTitle = Message.raw("Game Over").color(Color.RED).bold(true);
 		Message secondaryTitle = Message.raw("World will close in 10 seconds");
 		for (PlayerRef playerRef : getPlayerRefs()) {
-			EventTitleUtil.showEventTitleToPlayer(playerRef, primaryTitle, secondaryTitle, false, null, 2.0F, 0.5F, 0.5F);
+			EventTitleUtil.showEventTitleToPlayer(playerRef, primaryTitle, secondaryTitle, false, null, 4.0F, 0.5F, 0.5F);
+
 		}
 
-		world.sendMessage(Message.join(Message.raw("You collected "), Message.raw("" + data.getTotalScrap()).bold(true), Message.raw(" scrap!")).color(Color.YELLOW));
+		world.sendMessage(Message.raw("=========[Scrappers]========="));
+		world.sendMessage(primaryTitle);
+		world.sendMessage(Message.join(Message.raw("You survived "),Message.raw(data.getLastWave()+" Waves").bold(true).color(Color.green)));
+		world.sendMessage(Message.join(Message.raw("You collected "), Message.raw("" + data.getTotalScrap()).bold(true), Message.raw(" scrap")).color(Color.YELLOW));
+		world.sendMessage(Message.join(Message.raw("You died "), Message.raw("" + deathCount).bold(true), Message.raw(" times")).color(Color.RED));
+		world.sendMessage(Message.raw("============================"));
+
 
 		HytaleServer.SCHEDULED_EXECUTOR.schedule(()->{
 			world.execute(()->{
@@ -207,6 +215,11 @@ public class GameLogic {
 	public void addPlayerToDeadList(Ref<EntityStore> dead)
 	{
 		world.execute(()->deadPlayers.add(dead));
+		deathCount++;
+	}
+	public void countDeadPlayer()
+	{
+		deathCount++;
 	}
 	public void cleanup() {
 		executor.cancel(true);
