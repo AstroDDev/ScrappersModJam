@@ -4,7 +4,9 @@
 
 This game can be played solo or with friends !
 
-Every time you win or lose a game, the difficulty of the next instance will increase or decrease. Try to hit your high score!
+Every time you win or lose a game, the difficulty of the next instance will increase or decrease. Try to hit your high score! 
+
+Note: The uncompressed assets can be viewed at : https://github.com/AstroDDev/ScrappersModJamWorld
 
 ---
 
