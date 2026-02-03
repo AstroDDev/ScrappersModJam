@@ -32,10 +32,10 @@ public class DifficultyResource implements Resource<EntityStore> {
    }
 
    public void setLocalDifficulty(double diff) {
-      this.difficulty = diff;
+      this.difficulty = Math.max(0.25,diff);
    }
 	public void addDifficulty(double added) {
-		this.difficulty = Math.max(0.1,difficulty+added);
+		this.difficulty = Math.max(0.25,difficulty+added);
 	}
    @Nonnull
    @Override

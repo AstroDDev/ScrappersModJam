@@ -53,7 +53,7 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
         UICommandBuilder builder = new UICommandBuilder();
         builder.append("Hud.ui");
 		var diff=Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).getLocalDifficulty();
-		builder.set("#DifficultyLabel.Text","Difficulty: "+diff);
+		builder.set("#DifficultyLabel.Text","Hazard: "+(int)Math.floor(diff*100)+"%");
 		if(gameLogic.getWaveHelper().isIntermission()) {
 			//builder.set("#GearLabel.Text", "0/0");
 			builder.set("#WaveLabel.Text", "Prep Time");
