@@ -18,6 +18,7 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainer;
 import com.hypixel.hytale.server.core.inventory.container.ItemContainerUtil;
 import com.hypixel.hytale.server.core.modules.entity.player.PlayerItemEntityPickupSystem;
+import com.hypixel.hytale.server.core.modules.entity.teleport.Teleport;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.InteractionEffects;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.none.simple.ApplyEffectInteraction;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
@@ -41,7 +42,7 @@ public class GameLogic {
 	private ScheduledFuture<?> executor;
 	private boolean started = false;
 	private WaveHelper waveHelper;
-	private List<Ref<EntityStore>> deadPlayers=new ArrayList<>();
+	private List<Ref<EntityStore>> deadPlayers = new ArrayList<>();
 
 	public GameLogic(World world, GameConfig config) {
 		this.config = config;
@@ -53,14 +54,21 @@ public class GameLogic {
 		this.executor = HytaleServer.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> world.execute(this::tick), 500, 500, TimeUnit.MILLISECONDS);
 		this.started = true;
 		var savedDifficluty = Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).getLocalDifficulty();
-		this.waveHelper = new WaveHelper(config, savedDifficluty);
+		this.waveHelper = new WaveHelper(this, config, savedDifficluty, this::onGameEnd);
 		waveHelper.start(store);
 		waveHelper.setGameOverFunction(this::onGameEnd);
-
-		this.world.sendMessage(Message.raw("Hazard Level is " + Math.floor(savedDifficluty * 100)));
+		waveHelper.setNextWaveFunction((i)->respawnAllPlayers());
 	}
-	public void onGameEnd(EndedGameData data)
-	{
+
+	public void respawnAllPlayers() {
+		deadPlayers.forEach((p)->{
+			var tp=Teleport.createForPlayer(world.getWorldConfig().getSpawnProvider().getSpawnPoint(p,p.getStore()));
+			p.getStore().addComponent(p,Teleport.getComponentType(),tp);
+		});
+		deadPlayers.clear();
+	}
+
+	public void onGameEnd(EndedGameData data) {
 
 		this.stop();
 		Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).addDifficulty(data.isWon()? 0.25 : -0.1);
@@ -68,28 +76,12 @@ public class GameLogic {
 		world.sendMessage(Message.raw("You survived "+data.getLastWave()+" waves.\nYou collected "+data.getTotalScrap()+" scraps."));
 		world.sendMessage(Message.raw("Instance will close in 10 secondes"));
 		HytaleServer.SCHEDULED_EXECUTOR.schedule(()->{
-			world.stopIndividualWorld();
+			world.execute(()->{
+				world.drainPlayersTo(Universe.get().getDefaultWorld());
+			});
+
 
 		},10,TimeUnit.SECONDS);
-
-	}
-	/**
-	 * Temporary method, allow for easy collect scrap from inventory for now
-	 */
-	private void autoScoreScraps()
-	{
-				getPlayers().forEach(pl -> {
-
-					var trans = pl.getInventory().getCombinedEverything().removeItemStack(new ItemStack("RustyGear", 10), false, true);
-					var eaten = 10;
-					if(trans.getRemainder() != null)
-						eaten -= trans.getRemainder().getQuantity();
-					if(eaten > 0) {
-						waveHelper.scrapCollected(eaten,world);
-					}
-
-
-				});
 	}
 	public void applyEffect(String effectId,Ref<EntityStore> player)
 	{
@@ -161,6 +153,10 @@ public class GameLogic {
 		if(!atLeast1PlayerAlive)
 			waveHelper.forceEnd();
     }
+
+	public Collection<PlayerRef> getPlayerRefs() {
+		return world.getPlayerRefs();
+	}
 
 	public List<Player> getPlayers() {
 		return world.getPlayerRefs().stream().map((ref) -> ref.getReference().getStore().getComponent(ref.getReference(), Player.getComponentType())).toList();

@@ -10,7 +10,9 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.modjam.hytalemoddingjam.MainPlugin;
 import com.modjam.hytalemoddingjam.gameLogic.GameInstances;
 import com.modjam.hytalemoddingjam.gameLogic.GameLogic;
 
@@ -35,6 +37,10 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
         CustomUIHud customHud = player.getHudManager().getCustomHud();
         GameLogic gameLogic = GameInstances.get(player.getWorld());
         if (gameLogic == null) {
+			if(customHud instanceof MannCoHud)
+			{
+				customHud.update(true, new UICommandBuilder());
+			}
             return;
         }
 
@@ -46,14 +52,17 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
 
         UICommandBuilder builder = new UICommandBuilder();
         builder.append("Hud.ui");
+		var diff=Universe.get().getDefaultWorld().getEntityStore().getStore().getResource(MainPlugin.getDifficultyResourceType()).getLocalDifficulty();
+		builder.set("#DifficultyLabel.Text","Difficulty: "+diff);
 		if(gameLogic.getWaveHelper().isIntermission()) {
-			builder.set("#GearLabel.Text", "0/0");
+			//builder.set("#GearLabel.Text", "0/0");
 			builder.set("#WaveLabel.Text", "Prep Time");
 		}
 		else {
-			builder.set("#GearLabel.Text", gameLogic.getWaveHelper().getScrapCollectedWave()+"/"+gameLogic.getWaveHelper().getQuota());
+
 			builder.set("#WaveLabel.Text", "Wave "+(gameLogic.getWaveHelper().getWaveIndex()+1));
 		}
+		builder.set("#GearLabel.Text", gameLogic.getWaveHelper().getScrapCollectedWave()+"/"+gameLogic.getWaveHelper().getQuota());
 		var time=0;
 		if(gameLogic.getWaveHelper().isIntermission())
 			time=(int)Math.abs(System.currentTimeMillis() -  gameLogic.getWaveHelper().getWaveStartTime());
@@ -61,6 +70,13 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
 			time= (int) ((gameLogic.getWaveHelper().getWaveStartTime()+ gameLogic.config.getWaveLength())-System.currentTimeMillis());
 		time=time/1000;
 		builder.set("#TimerLabel.Text",""+time);
+
+//        showWaveText(gameLogic, builder);
+
+        customHud.update(true, builder);
+    }
+
+    private static void showWaveText(GameLogic gameLogic, UICommandBuilder builder) {
         if (System.currentTimeMillis() - gameLogic.getWaveHelper().getWaveStartTime() < ANNOUNCEMENT_LENGTH_MILLIS) {
             if (gameLogic.getWaveHelper().isIntermission()) {
                 // NOTE: this is + 1 for 0-indexed then - 1 because wave over happens after index increment
@@ -74,7 +90,5 @@ public class MannCoHudSystem extends EntityTickingSystem<EntityStore> {
         } else {
             builder.set("#BannerTitle.Text", "");
         }
-
-        customHud.update(true, builder);
     }
 }
